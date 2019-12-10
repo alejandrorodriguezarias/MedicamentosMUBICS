@@ -10,6 +10,7 @@ tmp
 
 x <- readMolFromSDF("C:/Users/Alex/Desktop/master/prueba.sdf")
 extractDrugALOGP(x.mol)
+y <- readMolFromSmi("C:/Users/Alex/Desktop/master/Bioinformatic/smiles.smi")
 #View(dataset_Chembl_Cytokines)
 tmp[4]
 install.packages("xlsx")
