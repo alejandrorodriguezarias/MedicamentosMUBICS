@@ -20,5 +20,11 @@ for(i in 1:length(smiles)) {
   descriptorsvalues
   vectorDescriptores <- rbind(vectorDescriptores,descriptorsvalues)
 }
-    
-             
+#eliminamos las columnas con marcadores nulos
+vectorDescriptores <- Filter(function(x)!all(is.na(x)),vectorDescriptores)
+#utilizamos la mediana como umbra para definir las clases IC50LOW e IC50HIGH
+tmp <- ifelse(medicamentos$value > median(medicamentos$value), 1, 0)
+vectorDescriptores$class <- tmp[1:2031]
+vectorDescriptores$class
+
+
