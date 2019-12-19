@@ -22,9 +22,20 @@ for(i in 1:length(smiles)) {
 }
 #eliminamos las columnas con marcadores nulos
 vectorDescriptores <- Filter(function(x)!all(is.na(x)),vectorDescriptores)
+vectorDescriptores <- vectorDescriptores[complete.cases(vectorDescriptores),]
 #utilizamos la mediana como umbra para definir las clases IC50LOW e IC50HIGH
 tmp <- ifelse(medicamentos$value > median(medicamentos$value), 1, 0)
 vectorDescriptores$class <- tmp[1:2031]
-vectorDescriptores$class
-
+vectorDescriptores$class <- NULL
+vectorDescriptores
+#version cutre de división de grupos
+nEntrenamiento = round(0.8 * nrow(vectorDescriptores))
+entrenamiento<-sample(1:nrow(vectorDescriptores),nEntrenamiento)
+conjunto_entrenamiento<-vectorDescriptores[entrenamiento,]
+conjunto_test<-vectorDescriptores[-entrenamiento,]
+y = tmp[entrenamiento]
+library(class)
+predicho <- knn(conjunto_entrenamiento,conjunto_test,cl=factor(y),k=5, l=0, prob=FALSE, use.all=TRUE)
+vectorDescriptores$class <- tmp[1:2029]
+probando <- vectorDescriptores[-entrenamiento,]
 
