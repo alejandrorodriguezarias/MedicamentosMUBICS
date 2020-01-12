@@ -39,3 +39,35 @@ predicho <- knn(conjunto_entrenamiento,conjunto_test,cl=factor(y),k=5, l=0, prob
 vectorDescriptores$class <- tmp[1:2029]
 probando <- vectorDescriptores[-entrenamiento,]
 
+
+
+
+#Random Forest
+
+library(randomForest)
+train_rows <- sample(nrow(vectorDescriptores), 0.8 * nrow(vectorDescriptores), replace = FALSE)
+train_set <- vectorDescriptores[train_rows, ]
+test_set <- vectorDescriptores[-train_rows, ]
+
+vectorDescriptores$CanonicalSmiles <- NULL
+tmp <- ifelse(medicamentos$value > median(medicamentos$value), 0, 1)
+vectorDescriptores$class <- as.factor(tmp[1:3559]) 
+
+#Random Forest para ver las variables importantes
+model_var_importantes <- randomForest(class ~ . , data = train_set, mtry = 100, importance=TRUE)
+varImpPlot(model_var_importantes)
+
+#Random Forest de todas las variables
+model <- randomForest(class ~ . , data = train_set, mtry = 100)
+
+test_set_predictions <- predict(model, test_set, type = "class")
+caret::confusionMatrix(test_set_predictions, test_set$class)
+
+
+#Random Forest eligiendo algunas variables importantes
+model <- randomForest(class ~ MDEN.22+MDEC.23+ECCEN+BCUTp.1h+BCUTc.1h+BCUTc.1l+WTPT.1+WTPT.4+WTPT.5+SPC.5+VP.5 , 
+                      data = train_set, mtry = 3)
+
+
+test_set_predictions <- predict(model, test_set, type = "class")
+caret::confusionMatrix(test_set_predictions, test_set$class)
