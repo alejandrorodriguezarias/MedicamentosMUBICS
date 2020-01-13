@@ -71,3 +71,30 @@ model <- randomForest(class ~ MDEN.22+MDEC.23+ECCEN+BCUTp.1h+BCUTc.1h+BCUTc.1l+W
 
 test_set_predictions <- predict(model, test_set, type = "class")
 caret::confusionMatrix(test_set_predictions, test_set$class)
+
+
+
+
+#KNN (casi la misma versión que la otra knn pero aquí se escalan los valores)
+
+library(class)
+set.seed(222)
+scaled_descriptors <- vectorDescriptores %>% mutate_if(is.numeric, .funs=scale)
+labels <- scaled_descriptors$class
+scaled_descriptors$class <- NULL
+scaled_descriptors <- Filter(function(x)!all(is.na(x)),scaled_descriptors)
+scaled_descriptors <- scaled_descriptors[complete.cases(scaled_descriptors),]
+
+
+train_rows <- sample(nrow(scaled_descriptors), 0.8 * nrow(scaled_descriptors), replace = FALSE)
+train_set <- scaled_descriptors[train_rows, ]
+test_set <- scaled_descriptors[-train_rows, ]
+train_labels <- labels[train_rows]
+test_set_labels <- labels[-train_rows]
+
+
+test_set_predictions <- knn(train = train_set, test = test_set, 
+                            cl= train_labels, k = 20)
+
+caret::confusionMatrix(table(test_set_predictions, test_set_labels))
+
